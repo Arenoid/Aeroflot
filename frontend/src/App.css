@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
+
+*{
+  box-sizing: border-box;
+}
+
+html,body,
+#root{
+  margin:0;
+  width: 100%;
+  height: 100%;
+}
+
+body{
+  font-family: "Lato", sans-serif;
+}
+
+.app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+.sidebar{
+  width: 300px;
+  padding: 20px;
+  background: #0c1b3b;
+  color: #706f70;
+  overflow-y: auto;
+}
+
+.sidebar h1{
+  margin-top: 0;
+  font-size: 22px;
+}
+
+.sidebar section{
+  margin-top: 28px;
+}
+
+.sidebar h2{
+  font-size: 16px;
+}
+
+.sidebar button{
+  width: 100%;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.sidebar h2{
+  font-size:16px;
+}
+
+.sidebar button{
+  width:100%;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.map{
+  flex:1;
+}
