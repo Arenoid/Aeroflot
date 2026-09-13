@@ -12,6 +12,7 @@
   "dependencies": {
     "@mapbox/mapbox-gl-draw": "^1.5.1",
     "@turf/area": "^7.4.0",
+    "@turf/distance": "^7.4.0",
     "@turf/helpers": "^7.4.0",
     "maplibre-gl": "^6.8.0",
     "react": "^19.2.8",

@@ -42,11 +42,13 @@ function App(){
   const drawingRef = useRef(false)
   const pointsRef = useRef<[number, number][]>([])
   const rectangleStartRef = useRef<[number, number] | null>(null)
-  const [searchAreaKm2, setSearchAreaKm2] = useState<number|null >(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [weatherLoading, setWeatherLoading] = useState(false)
   const [weatherError, setWeatherError] = useState(false)
+  const [searchAreaKm2, setSearchAreaKm2] = useState<number | null>(null)
+  // const [searchWidthKm, setSearchWidthKm] = useState<number | null>(null)
+  // const [searchHeightKm, setSearchHeightKm] = useState<number | null>(null)
   
   
     useEffect(() =>{
@@ -191,57 +193,6 @@ function App(){
         })
       }
       console.log("First Rectangle Corner", point)
-    map.on("mousemove", (event) => {
-      if(!drawingRef.current) return
-      if(!rectangleStartRef.current) return
-
-      const start = rectangleStartRef.current
-
-      const current: [number, number] = [
-        event.lngLat.lng,
-        event.lngLat.lat,
-      ]
-
-      const [lng1, lat1] = start
-      const [lng2, lat2] = current
-
-      const previewRectangle: [number, number][] = [
-        [lng1, lat1],
-        [lng2, lat1],
-        [lng2, lat2],
-        [lng1, lat2],
-        [lng1, lat1],
-      ]
-
-      const previewSource = map.getSource(
-        "search-preview"
-      ) as GeoJSONSource
-
-      if(!previewSource) return
-
-      previewSource.setData({
-        type: "FeatureCollection",
-        features: [
-          {
-          type: "Feature",
-          properties: {},
-          geometry: {
-            type: "Polygon",
-            coordinates: [previewRectangle],
-          },
-        },
-
-        {
-          type: "Feature",
-          properties: {},
-          geometry: {
-            type: "Point",
-            coordinates: start,
-          },
-        },
-      ],
-    })
-  })
       return
     }
 
@@ -262,6 +213,17 @@ function App(){
     const source = map.getSource("search-area") as GeoJSONSource
     if(!source) return
     source.setData(rectangleFeature)
+
+    const previewSource = map.getSource(
+      "search-preview"
+    ) as GeoJSONSource
+
+    if(previewSource){
+      previewSource.setData({
+        type: "FeatureCollection",
+        features: [],
+      })
+    }
     
     const squareMeters = area(rectangleFeature)
     const squareKilometers = squareMeters/1_000_000
@@ -277,6 +239,61 @@ function App(){
 
     console.log("Rectangle:", rectangle)
     console.log("Area:", squareKilometers, "km²")
+  })
+  map.on("mousemove", (event) => {
+    if (!drawingRef.current) return
+    if(!rectangleStartRef.current) return
+
+    const start = rectangleStartRef.current
+
+    const current: [number, number] = [
+      event.lngLat.lng,
+      event.lngLat.lat,
+    ]
+
+    const [lng1, lat1] = start
+    const [lng2, lat2] = current
+
+    const previewRectangle: [number, number][] = [
+      [lng1, lat1],
+      [lng2, lat1],
+      [lng2, lat2],
+      [lng1, lat2],
+      [lng1, lat1],
+    ]
+
+    const previewFeature = polygon([previewRectangle])
+    const previewSquareMeters = area(previewFeature)
+    const previewKm2 = previewSquareMeters/1_000_000
+
+    setSearchAreaKm2(previewKm2)
+    const previewSource = map.getSource(
+      "search-preview"
+    ) as GeoJSONSource
+
+    
+    if(!previewSource) return
+    previewSource.setData({
+      type: "FeatureCollection",
+      features:[
+        {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "Polygon",
+            coordinates: [previewRectangle],
+          },
+        },
+        {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "Point",
+            coordinates: start,
+          },
+        },
+      ],
+    })
   })
   fetchWeather(27.7172, 85.324)
 
@@ -315,6 +332,7 @@ function App(){
       drawingRef.current = false
       rectangleStartRef.current = null
       setIsDrawing(false)
+      setSearchAreaKm2(null)
 
       const previewSource = map.getSource(
         "search-preview"
